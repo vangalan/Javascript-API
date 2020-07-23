@@ -1,5 +1,5 @@
 
-var data = (localStorage.getItem('todoList')) ? JSON.parse(localStorage.getItem('todoList')):{
+var data = (localStorage.getItem('todoList')) ? JSON.parse(localStorage.getItem('todoList')) : {
   todo: [],
   completed: []
 };
@@ -12,7 +12,7 @@ renderTodoList();
 
 // User clicked on the add button
 // If there is any text inside the item field, add that text to the todo list
-document.getElementById('add').addEventListener('click', function() {
+document.getElementById('add').addEventListener('click', function () {
   var value = document.getElementById('item').value;
   if (value) {
     addItem(value);
@@ -26,9 +26,10 @@ document.getElementById('item').addEventListener('keydown', function (e) {
   }
 });
 
-function addItem (value) {
+function addItem(value) {
   addItemToDOM(value);
   document.getElementById('item').value = '';
+  sendItemtoAPI(value);
 
   data.todo.push(value);
   dataObjectUpdated();
@@ -84,7 +85,7 @@ function completeItem() {
   dataObjectUpdated();
 
   // Check if the item should be added to the completed list or to re-added to the todo list
-  var target = (id === 'todo') ? document.getElementById('completed'):document.getElementById('todo');
+  var target = (id === 'todo') ? document.getElementById('completed') : document.getElementById('todo');
 
   parent.removeChild(item);
   target.insertBefore(item, target.childNodes[0]);
@@ -92,7 +93,7 @@ function completeItem() {
 
 // Adds a new item to the todo list
 function addItemToDOM(text, completed) {
-  var list = (completed) ? document.getElementById('completed'):document.getElementById('todo');
+  var list = (completed) ? document.getElementById('completed') : document.getElementById('todo');
 
   var item = document.createElement('li');
   item.innerText = text;
@@ -119,4 +120,22 @@ function addItemToDOM(text, completed) {
   item.appendChild(buttons);
 
   list.insertBefore(item, list.childNodes[0]);
+}
+
+// Method for sending to-do item to API
+function sendItemtoAPI(item) {
+  var req = new XMLHttpRequest();
+  req.open('POST', '/add');
+  req.setRequestHeader('Content-Ty', 'application/json');
+  req.send(JSON.stringify({ item: item }));
+
+  req.addEventListener('load', () => {
+    // console.log(req.responseText);
+    console.log('Request done!');
+  });
+
+  req.addEventListener('error', () => {
+    console.log('crap, Something bad happened!');
+    console.log(e)
+  })
 }
